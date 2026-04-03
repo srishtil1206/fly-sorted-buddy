@@ -1,9 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Bookmark, Share2, Check, ExternalLink, Lock, Sparkles, Calendar, Wallet, Globe } from "lucide-react";
 import { useDestination, visaTypeLabel } from "@/hooks/useDestinations";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import VisaBadge from "@/components/VisaBadge";
 import Logo from "@/components/Logo";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Accordion,
@@ -68,19 +77,71 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const PremiumBlur = ({ children }: { children: React.ReactNode }) => (
-  <div className="relative">
-    <div className="max-h-[120px] overflow-hidden">
-      {children}
-    </div>
-    <div className="absolute inset-0 top-8 flex flex-col items-center justify-end bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-12">
-      <button className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95">
-        <Sparkles size={14} />
-        Unlock with Sorted Premium — ₹299/year
-      </button>
-    </div>
-  </div>
-);
+const PremiumBlur = ({ children, isPremium }: { children: React.ReactNode; isPremium?: boolean }) => {
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState("");
+
+  if (isPremium) return <>{children}</>;
+
+  const handleNotify = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("We'll notify you when Premium launches!");
+    setShowModal(false);
+    setNotifyEmail("");
+  };
+
+  return (
+    <>
+      <div className="relative">
+        <div className="max-h-[120px] overflow-hidden">
+          {children}
+        </div>
+        <div className="absolute inset-0 top-8 flex flex-col items-center justify-end bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-12">
+          <p className="text-[10px] text-muted-foreground mb-2 text-center max-w-[250px]">
+            Unlock transport guides, accommodation tips, and offline access for all 20 destinations
+          </p>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
+          >
+            <Sparkles size={14} />
+            Get Sorted Premium — ₹299/year
+          </button>
+        </div>
+      </div>
+
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="mx-auto max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-extrabold text-secondary">
+              Coming Soon! 🚀
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-center text-sm text-muted-foreground">
+            Premium is launching soon. We'll notify you when it's ready.
+          </p>
+          <form onSubmit={handleNotify} className="mt-4 space-y-3">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={notifyEmail}
+              onChange={(e) => setNotifyEmail(e.target.value)}
+              required
+              className="w-full rounded-xl border border-border/60 bg-card py-3 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 active:scale-[0.98]"
+            >
+              Notify Me
+            </button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
 
 // Safe accessors for JSONB content
 const arr = (val: unknown): any[] => (Array.isArray(val) ? val : []);
@@ -90,8 +151,38 @@ const obj = (val: unknown): Record<string, any> => (val && typeof val === "objec
 const DestinationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [saved, setSaved] = useState(false);
+  const { user, profile, refreshProfile } = useAuth();
   const { data: dest, isLoading } = useDestination(id);
+
+  const isSaved = profile?.saved_destinations?.includes(id || "") ?? false;
+  const isPremium = profile?.is_premium ?? false;
+
+  const handleSave = async () => {
+    if (!user) {
+      toast("Sign up to save your guides", {
+        action: { label: "Sign Up", onClick: () => navigate("/profile") },
+      });
+      return;
+    }
+    if (!id || !profile) return;
+
+    const current = profile.saved_destinations ?? [];
+    const updated = isSaved
+      ? current.filter((did) => did !== id)
+      : [...current, id];
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ saved_destinations: updated })
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast.error("Failed to save");
+      return;
+    }
+    await refreshProfile();
+    toast.success(isSaved ? "Removed from saved" : "Saved!");
+  };
 
   if (isLoading) {
     return (
@@ -137,10 +228,10 @@ const DestinationDetail = () => {
           <Logo />
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setSaved(!saved)}
-              className={`rounded-full p-2 transition-all active:scale-90 ${saved ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+              onClick={handleSave}
+              className={`rounded-full p-2 transition-all active:scale-90 ${isSaved ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
             >
-              <Bookmark size={16} fill={saved ? "currentColor" : "none"} />
+              <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />
             </button>
             <button onClick={handleShare} className="rounded-full bg-muted p-2 text-muted-foreground transition-all active:scale-90">
               <Share2 size={16} />
@@ -375,7 +466,7 @@ const DestinationDetail = () => {
               <SectionLabel label="Premium" premium />
             </AccordionTrigger>
             <AccordionContent className="px-4">
-              <PremiumBlur>
+              <PremiumBlur isPremium={isPremium}>
                 {arr(transport.airport_to_city).length > 0 && (
                   <>
                     <h4 className="text-xs font-bold text-foreground mb-2">Airport to City</h4>
@@ -432,7 +523,7 @@ const DestinationDetail = () => {
               <SectionLabel label="Premium" premium />
             </AccordionTrigger>
             <AccordionContent className="px-4">
-              <PremiumBlur>
+              <PremiumBlur isPremium={isPremium}>
                 {arr(stay.neighborhoods).length > 0 && (
                   <>
                     <h4 className="text-xs font-bold text-foreground mb-2">Best Neighborhoods</h4>
