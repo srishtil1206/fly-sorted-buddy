@@ -77,19 +77,71 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const PremiumBlur = ({ children }: { children: React.ReactNode }) => (
-  <div className="relative">
-    <div className="max-h-[120px] overflow-hidden">
-      {children}
-    </div>
-    <div className="absolute inset-0 top-8 flex flex-col items-center justify-end bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-12">
-      <button className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95">
-        <Sparkles size={14} />
-        Unlock with Sorted Premium — ₹299/year
-      </button>
-    </div>
-  </div>
-);
+const PremiumBlur = ({ children, isPremium }: { children: React.ReactNode; isPremium?: boolean }) => {
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState("");
+
+  if (isPremium) return <>{children}</>;
+
+  const handleNotify = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("We'll notify you when Premium launches!");
+    setShowModal(false);
+    setNotifyEmail("");
+  };
+
+  return (
+    <>
+      <div className="relative">
+        <div className="max-h-[120px] overflow-hidden">
+          {children}
+        </div>
+        <div className="absolute inset-0 top-8 flex flex-col items-center justify-end bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-12">
+          <p className="text-[10px] text-muted-foreground mb-2 text-center max-w-[250px]">
+            Unlock transport guides, accommodation tips, and offline access for all 20 destinations
+          </p>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
+          >
+            <Sparkles size={14} />
+            Get Sorted Premium — ₹299/year
+          </button>
+        </div>
+      </div>
+
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="mx-auto max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-extrabold text-secondary">
+              Coming Soon! 🚀
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-center text-sm text-muted-foreground">
+            Premium is launching soon. We'll notify you when it's ready.
+          </p>
+          <form onSubmit={handleNotify} className="mt-4 space-y-3">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={notifyEmail}
+              onChange={(e) => setNotifyEmail(e.target.value)}
+              required
+              className="w-full rounded-xl border border-border/60 bg-card py-3 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 active:scale-[0.98]"
+            >
+              Notify Me
+            </button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
 
 // Safe accessors for JSONB content
 const arr = (val: unknown): any[] => (Array.isArray(val) ? val : []);
