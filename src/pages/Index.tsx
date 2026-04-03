@@ -1,26 +1,30 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import SearchBar from "@/components/SearchBar";
-import DestinationCard from "@/components/DestinationCard";
 import BottomNav from "@/components/BottomNav";
-import { destinations } from "@/data/destinations";
+import VisaBadge from "@/components/VisaBadge";
+import { useDestinations, visaTypeLabel } from "@/hooks/useDestinations";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+  const { data: destinations, isLoading } = useDestinations();
 
   const filtered = useMemo(() => {
+    if (!destinations) return [];
     const q = search.toLowerCase().trim();
     if (!q) return destinations;
     return destinations.filter(
       (d) =>
-        d.country.toLowerCase().includes(q) ||
-        d.visaType.toLowerCase().includes(q)
+        d.country_name.toLowerCase().includes(q) ||
+        visaTypeLabel[d.visa_type]?.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, destinations]);
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
       <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-lg px-5 pt-[env(safe-area-inset-top)] pb-2">
         <div className="mx-auto max-w-lg flex items-center justify-between py-3">
           <Logo />
@@ -31,7 +35,6 @@ const Index = () => {
       </header>
 
       <main className="mx-auto max-w-lg px-5">
-        {/* Hero */}
         <section className="mt-2 mb-6 animate-fade-up">
           <h1 className="text-[1.7rem] leading-tight font-extrabold text-secondary">
             Your first international trip,{" "}
@@ -42,26 +45,48 @@ const Index = () => {
           </p>
         </section>
 
-        {/* Search */}
         <div className="mb-5 animate-fade-up" style={{ animationDelay: "100ms" }}>
           <SearchBar value={search} onChange={setSearch} />
         </div>
 
-        {/* Destinations */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-foreground">
-              Popular Destinations
-            </h2>
+            <h2 className="text-sm font-bold text-foreground">Popular Destinations</h2>
             <span className="text-xs text-muted-foreground font-medium">
-              {filtered.length} countries
+              {isLoading ? "..." : `${filtered.length} countries`}
             </span>
           </div>
+
           <div className="flex flex-col gap-3">
-            {filtered.map((d, i) => (
-              <DestinationCard key={d.id} destination={d} index={i} />
-            ))}
-            {filtered.length === 0 && (
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[72px] rounded-xl" />
+                ))
+              : filtered.map((d, i) => (
+                  <div
+                    key={d.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => navigate(`/destination/${d.id}`)}
+                    onKeyDown={(e) => e.key === "Enter" && navigate(`/destination/${d.id}`)}
+                    className="group flex items-start gap-3.5 rounded-xl bg-card p-4 shadow-sm border border-border/60 transition-all duration-200 active:scale-[0.98] hover:shadow-md hover:-translate-y-0.5 animate-fade-up cursor-pointer select-none"
+                    style={{ animationDelay: `${i * 40}ms` }}
+                  >
+                    <span className="text-3xl leading-none mt-0.5">{d.flag_emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="font-semibold text-sm text-foreground truncate">
+                          {d.country_name}
+                        </h3>
+                        <VisaBadge type={visaTypeLabel[d.visa_type] || d.visa_type} />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        {d.hero_tagline}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+            {!isLoading && filtered.length === 0 && (
               <p className="text-center text-sm text-muted-foreground py-8">
                 No destinations found. Try a different search.
               </p>
