@@ -228,10 +228,10 @@ const DestinationDetail = () => {
           <Logo />
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setSaved(!saved)}
-              className={`rounded-full p-2 transition-all active:scale-90 ${saved ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+              onClick={handleSave}
+              className={`rounded-full p-2 transition-all active:scale-90 ${isSaved ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
             >
-              <Bookmark size={16} fill={saved ? "currentColor" : "none"} />
+              <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />
             </button>
             <button onClick={handleShare} className="rounded-full bg-muted p-2 text-muted-foreground transition-all active:scale-90">
               <Share2 size={16} />
