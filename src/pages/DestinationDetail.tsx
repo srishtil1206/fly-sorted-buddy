@@ -151,8 +151,38 @@ const obj = (val: unknown): Record<string, any> => (val && typeof val === "objec
 const DestinationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [saved, setSaved] = useState(false);
+  const { user, profile, refreshProfile } = useAuth();
   const { data: dest, isLoading } = useDestination(id);
+
+  const isSaved = profile?.saved_destinations?.includes(id || "") ?? false;
+  const isPremium = profile?.is_premium ?? false;
+
+  const handleSave = async () => {
+    if (!user) {
+      toast("Sign up to save your guides", {
+        action: { label: "Sign Up", onClick: () => navigate("/profile") },
+      });
+      return;
+    }
+    if (!id || !profile) return;
+
+    const current = profile.saved_destinations ?? [];
+    const updated = isSaved
+      ? current.filter((did) => did !== id)
+      : [...current, id];
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ saved_destinations: updated })
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast.error("Failed to save");
+      return;
+    }
+    await refreshProfile();
+    toast.success(isSaved ? "Removed from saved" : "Saved!");
+  };
 
   if (isLoading) {
     return (
