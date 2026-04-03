@@ -7,8 +7,11 @@ const DestinationCard = ({ destination, index }: { destination: Destination; ind
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => navigate(`/destination/${destination.id}`)}
-      className="group flex items-start gap-3.5 rounded-xl bg-card p-4 shadow-sm border border-border/60 transition-all duration-200 active:scale-[0.98] hover:shadow-md hover:-translate-y-0.5 animate-fade-up cursor-pointer"
+      onKeyDown={(e) => e.key === "Enter" && navigate(`/destination/${destination.id}`)}
+      className="group flex items-start gap-3.5 rounded-xl bg-card p-4 shadow-sm border border-border/60 transition-all duration-200 active:scale-[0.98] hover:shadow-md hover:-translate-y-0.5 animate-fade-up cursor-pointer select-none"
       style={{ animationDelay: `${index * 40}ms` }}
     >
       <span className="text-3xl leading-none mt-0.5">{destination.flag}</span>
