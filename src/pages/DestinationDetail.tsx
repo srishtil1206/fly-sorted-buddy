@@ -523,7 +523,7 @@ const DestinationDetail = () => {
               <SectionLabel label="Premium" premium />
             </AccordionTrigger>
             <AccordionContent className="px-4">
-              <PremiumBlur>
+              <PremiumBlur isPremium={isPremium}>
                 {arr(stay.neighborhoods).length > 0 && (
                   <>
                     <h4 className="text-xs font-bold text-foreground mb-2">Best Neighborhoods</h4>
