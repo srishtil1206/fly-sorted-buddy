@@ -466,7 +466,7 @@ const DestinationDetail = () => {
               <SectionLabel label="Premium" premium />
             </AccordionTrigger>
             <AccordionContent className="px-4">
-              <PremiumBlur>
+              <PremiumBlur isPremium={isPremium}>
                 {arr(transport.airport_to_city).length > 0 && (
                   <>
                     <h4 className="text-xs font-bold text-foreground mb-2">Airport to City</h4>
