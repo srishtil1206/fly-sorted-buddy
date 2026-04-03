@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ArrowLeft, Bookmark, Share2, Check, ExternalLink, Lock, Sparkles, Calendar, Wallet, Globe } from "lucide-react";
 import { useDestination, visaTypeLabel } from "@/hooks/useDestinations";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import VisaBadge from "@/components/VisaBadge";
 import Logo from "@/components/Logo";
+import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -103,7 +104,7 @@ const PremiumBlur = ({ children, isPremium }: { children: React.ReactNode; isPre
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
+            className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95 min-h-[44px]"
           >
             <Sparkles size={14} />
             Get Sorted Premium — ₹299/year
@@ -128,11 +129,11 @@ const PremiumBlur = ({ children, isPremium }: { children: React.ReactNode; isPre
               value={notifyEmail}
               onChange={(e) => setNotifyEmail(e.target.value)}
               required
-              className="w-full rounded-xl border border-border/60 bg-card py-3 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full rounded-xl border border-border/60 bg-card py-3 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 min-h-[44px]"
             />
             <button
               type="submit"
-              className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 active:scale-[0.98]"
+              className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 active:scale-[0.98] min-h-[44px]"
             >
               Notify Me
             </button>
@@ -186,11 +187,15 @@ const DestinationDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-5 space-y-4">
-        <Skeleton className="h-10 w-32" />
+      <div className="min-h-screen bg-background p-5 space-y-4 animate-pulse">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-6 w-24" />
+        </div>
         <Skeleton className="h-48 w-full rounded-xl" />
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <Skeleton className="h-24 w-full rounded-xl" />
+        <Skeleton className="h-16 w-full rounded-xl" />
+        <Skeleton className="h-16 w-full rounded-xl" />
+        <Skeleton className="h-16 w-full rounded-xl" />
       </div>
     );
   }
@@ -209,6 +214,12 @@ const DestinationDetail = () => {
   const transport = obj(dest.transport_content);
   const stay = obj(dest.accommodation_content);
 
+  const lastUpdated = new Date(dest.updated_at).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({ title: `${dest.country_name} — Sorted`, url: window.location.href });
@@ -218,22 +229,22 @@ const DestinationDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-screen bg-background pb-12 animate-slide-in">
       {/* Top Nav */}
       <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-lg border-b border-border/50">
         <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors active:text-foreground">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors active:text-foreground min-h-[44px] min-w-[44px] justify-center">
             <ArrowLeft size={18} />
           </button>
           <Logo />
           <div className="flex items-center gap-2">
             <button
               onClick={handleSave}
-              className={`rounded-full p-2 transition-all active:scale-90 ${isSaved ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+              className={`rounded-full p-2 transition-all active:scale-90 min-h-[44px] min-w-[44px] flex items-center justify-center ${isSaved ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
             >
               <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />
             </button>
-            <button onClick={handleShare} className="rounded-full bg-muted p-2 text-muted-foreground transition-all active:scale-90">
+            <button onClick={handleShare} className="rounded-full bg-muted p-2 text-muted-foreground transition-all active:scale-90 min-h-[44px] min-w-[44px] flex items-center justify-center">
               <Share2 size={16} />
             </button>
           </div>
@@ -269,7 +280,7 @@ const DestinationDetail = () => {
         <Accordion type="single" defaultValue="visa" collapsible className="space-y-3">
           {/* VISA */}
           <AccordionItem value="visa" className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
-            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline">
+            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline min-h-[44px]">
               <span className="flex items-center gap-2">🛂 Visa & Entry</span>
               <SectionLabel label="Free" />
             </AccordionTrigger>
@@ -319,7 +330,7 @@ const DestinationDetail = () => {
                   href={str(visa.apply_link)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-transform active:scale-95"
+                  className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-transform active:scale-95 min-h-[44px]"
                 >
                   <ExternalLink size={14} /> Apply for Visa
                 </a>
@@ -329,7 +340,7 @@ const DestinationDetail = () => {
 
           {/* FOREX */}
           <AccordionItem value="forex" className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
-            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline">
+            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline min-h-[44px]">
               <span className="flex items-center gap-2">💱 Currency & Forex</span>
               <SectionLabel label="Free" />
             </AccordionTrigger>
@@ -401,7 +412,7 @@ const DestinationDetail = () => {
 
           {/* SIM */}
           <AccordionItem value="sim" className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
-            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline">
+            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline min-h-[44px]">
               <span className="flex items-center gap-2">📱 SIM & Internet</span>
               <SectionLabel label="Free" />
             </AccordionTrigger>
@@ -461,7 +472,7 @@ const DestinationDetail = () => {
 
           {/* TRANSPORT — PREMIUM */}
           <AccordionItem value="transport" className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
-            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline">
+            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline min-h-[44px]">
               <span className="flex items-center gap-2">🚌 Getting Around</span>
               <SectionLabel label="Premium" premium />
             </AccordionTrigger>
@@ -518,7 +529,7 @@ const DestinationDetail = () => {
 
           {/* STAY — PREMIUM */}
           <AccordionItem value="stay" className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm">
-            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline">
+            <AccordionTrigger className="px-4 py-3.5 text-sm font-bold hover:no-underline min-h-[44px]">
               <span className="flex items-center gap-2">🏠 Where to Stay</span>
               <SectionLabel label="Premium" premium />
             </AccordionTrigger>
@@ -574,7 +585,16 @@ const DestinationDetail = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        {/* Last Updated */}
+        <div className="mt-6 text-center">
+          <p className="text-[11px] text-muted-foreground">
+            Last updated: {lastUpdated}
+          </p>
+        </div>
       </main>
+
+      <Footer />
     </div>
   );
 };

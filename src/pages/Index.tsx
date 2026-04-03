@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import SearchBar from "@/components/SearchBar";
 import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer";
+import InstallPrompt from "@/components/InstallPrompt";
 import VisaBadge from "@/components/VisaBadge";
 import { useDestinations, visaTypeLabel } from "@/hooks/useDestinations";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -60,7 +62,19 @@ const Index = () => {
           <div className="flex flex-col gap-3">
             {isLoading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[72px] rounded-xl" />
+                  <div key={i} className="rounded-xl bg-card p-4 border border-border/60">
+                    <div className="flex items-start gap-3.5">
+                      <Skeleton className="h-9 w-9 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-5 w-16 rounded-full" />
+                        </div>
+                        <Skeleton className="h-3 w-full" />
+                        <Skeleton className="h-3 w-3/4" />
+                      </div>
+                    </div>
+                  </div>
                 ))
               : filtered.map((d, i) => (
                   <div
@@ -69,7 +83,7 @@ const Index = () => {
                     tabIndex={0}
                     onClick={() => navigate(`/destination/${d.id}`)}
                     onKeyDown={(e) => e.key === "Enter" && navigate(`/destination/${d.id}`)}
-                    className="group flex items-start gap-3.5 rounded-xl bg-card p-4 shadow-sm border border-border/60 transition-all duration-200 active:scale-[0.98] hover:shadow-md hover:-translate-y-0.5 animate-fade-up cursor-pointer select-none"
+                    className="group flex items-start gap-3.5 rounded-xl bg-card p-4 shadow-sm border border-border/60 transition-all duration-200 active:scale-[0.98] hover:shadow-md hover:-translate-y-0.5 animate-fade-up cursor-pointer select-none min-h-[44px]"
                     style={{ animationDelay: `${i * 40}ms` }}
                   >
                     <span className="text-3xl leading-none mt-0.5">{d.flag_emoji}</span>
@@ -95,6 +109,8 @@ const Index = () => {
         </section>
       </main>
 
+      <Footer />
+      <InstallPrompt />
       <BottomNav />
     </div>
   );
