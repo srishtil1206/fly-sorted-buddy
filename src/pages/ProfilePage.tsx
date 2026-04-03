@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Logo from "@/components/Logo";
 import BottomNav from "@/components/BottomNav";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 const ProfilePage = () => {
   const { user, profile, loading, signOut } = useAuth();
@@ -33,7 +34,6 @@ const ProfilePage = () => {
       </header>
 
       <main className="mx-auto max-w-lg px-5 mt-4">
-        {/* User Card */}
         <div className="rounded-xl bg-gradient-to-br from-primary via-primary/90 to-secondary p-5 shadow-lg">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-foreground/20 text-xl font-bold text-primary-foreground">
@@ -56,12 +56,11 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Menu Items */}
         <div className="mt-6 space-y-2">
           {!profile?.is_premium && (
             <button
               onClick={() => navigate("/premium")}
-              className="flex w-full items-center justify-between rounded-xl bg-card border border-border/60 p-4 transition-all active:scale-[0.98]"
+              className="flex w-full items-center justify-between rounded-xl bg-card border border-border/60 p-4 transition-all active:scale-[0.98] min-h-[44px]"
             >
               <div className="flex items-center gap-3">
                 <Crown size={20} className="text-primary" />
@@ -76,7 +75,7 @@ const ProfilePage = () => {
 
           <button
             onClick={() => navigate("/saved")}
-            className="flex w-full items-center justify-between rounded-xl bg-card border border-border/60 p-4 transition-all active:scale-[0.98]"
+            className="flex w-full items-center justify-between rounded-xl bg-card border border-border/60 p-4 transition-all active:scale-[0.98] min-h-[44px]"
           >
             <div className="flex items-center gap-3">
               <Crown size={20} className="text-muted-foreground" />
@@ -90,7 +89,7 @@ const ProfilePage = () => {
               await signOut();
               toast.success("Signed out");
             }}
-            className="flex w-full items-center gap-3 rounded-xl bg-card border border-border/60 p-4 text-destructive transition-all active:scale-[0.98]"
+            className="flex w-full items-center gap-3 rounded-xl bg-card border border-border/60 p-4 text-destructive transition-all active:scale-[0.98] min-h-[44px]"
           >
             <LogOut size={20} />
             <p className="text-sm font-semibold">Sign Out</p>
@@ -101,6 +100,15 @@ const ProfilePage = () => {
       <BottomNav />
     </div>
   );
+};
+
+const fireConfetti = () => {
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ["#FF6B2B", "#1E2A4A", "#FFFBF7", "#34A853"],
+  });
 };
 
 const AuthForm = () => {
@@ -121,7 +129,8 @@ const AuthForm = () => {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account");
+        fireConfetti();
+        toast.success("Check your email to confirm your account 🎉");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -165,10 +174,9 @@ const AuthForm = () => {
           </p>
         </div>
 
-        {/* Google Sign In */}
         <button
           onClick={handleGoogleSignIn}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-all active:scale-[0.98] hover:shadow-md"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-all active:scale-[0.98] hover:shadow-md min-h-[44px]"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -185,7 +193,6 @@ const AuthForm = () => {
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        {/* Email Form */}
         <form onSubmit={handleEmailAuth} className="space-y-3">
           <div className="relative">
             <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -195,7 +202,7 @@ const AuthForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-xl border border-border/60 bg-card py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full rounded-xl border border-border/60 bg-card py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 min-h-[44px]"
             />
           </div>
           <div className="relative">
@@ -207,12 +214,12 @@ const AuthForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full rounded-xl border border-border/60 bg-card py-3 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full rounded-xl border border-border/60 bg-card py-3 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 min-h-[44px]"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2"
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -221,7 +228,7 @@ const AuthForm = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all active:scale-[0.98] disabled:opacity-60"
+            className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all active:scale-[0.98] disabled:opacity-60 min-h-[44px]"
           >
             {submitting ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
           </button>
@@ -231,7 +238,7 @@ const AuthForm = () => {
           {isSignUp ? "Already have an account? " : "Don't have an account? "}
           <button
             onClick={() => setIsSignUp(!isSignUp)}
-            className="font-bold text-primary"
+            className="font-bold text-primary min-h-[44px]"
           >
             {isSignUp ? "Sign In" : "Sign Up"}
           </button>
