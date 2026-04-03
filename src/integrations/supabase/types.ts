@@ -14,7 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      destinations: {
+        Row: {
+          accommodation_content: Json
+          avg_daily_budget_inr: number
+          best_months: string
+          country_code: string
+          country_name: string
+          created_at: string
+          currency_code: string
+          currency_name: string
+          display_order: number
+          flag_emoji: string
+          forex_content: Json
+          hero_tagline: string
+          id: string
+          is_premium_accommodation: boolean
+          is_premium_transport: boolean
+          sim_content: Json
+          transport_content: Json
+          updated_at: string
+          visa_content: Json
+          visa_type: string
+        }
+        Insert: {
+          accommodation_content?: Json
+          avg_daily_budget_inr: number
+          best_months: string
+          country_code: string
+          country_name: string
+          created_at?: string
+          currency_code: string
+          currency_name: string
+          display_order?: number
+          flag_emoji: string
+          forex_content?: Json
+          hero_tagline: string
+          id?: string
+          is_premium_accommodation?: boolean
+          is_premium_transport?: boolean
+          sim_content?: Json
+          transport_content?: Json
+          updated_at?: string
+          visa_content?: Json
+          visa_type: string
+        }
+        Update: {
+          accommodation_content?: Json
+          avg_daily_budget_inr?: number
+          best_months?: string
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          currency_code?: string
+          currency_name?: string
+          display_order?: number
+          flag_emoji?: string
+          forex_content?: Json
+          hero_tagline?: string
+          id?: string
+          is_premium_accommodation?: boolean
+          is_premium_transport?: boolean
+          sim_content?: Json
+          transport_content?: Json
+          updated_at?: string
+          visa_content?: Json
+          visa_type?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_premium: boolean
+          saved_destinations: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_premium?: boolean
+          saved_destinations?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_premium?: boolean
+          saved_destinations?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
