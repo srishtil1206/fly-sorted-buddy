@@ -1,9 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Bookmark, Share2, Check, ExternalLink, Lock, Sparkles, Calendar, Wallet, Globe } from "lucide-react";
 import { useDestination, visaTypeLabel } from "@/hooks/useDestinations";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import VisaBadge from "@/components/VisaBadge";
 import Logo from "@/components/Logo";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Accordion,
