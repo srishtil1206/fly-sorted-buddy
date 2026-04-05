@@ -59,47 +59,45 @@ const Index = () => {
             </span>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {isLoading
-              ? Array.from({ length: 5 }).map((_, i) => (
+              ? Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="rounded-xl bg-card p-4 border border-border/60">
-                    <div className="flex items-start gap-3.5">
-                      <Skeleton className="h-9 w-9 rounded-lg" />
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Skeleton className="h-4 w-24" />
-                          <Skeleton className="h-5 w-16 rounded-full" />
-                        </div>
-                        <Skeleton className="h-3 w-full" />
-                        <Skeleton className="h-3 w-3/4" />
-                      </div>
+                    <div className="flex flex-col items-center gap-2 text-center">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-5 w-16 rounded-full" />
                     </div>
                   </div>
                 ))
-              : filtered.map((d, i) => (
-                  <div
-                    key={d.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => navigate(`/destination/${d.id}`)}
-                    onKeyDown={(e) => e.key === "Enter" && navigate(`/destination/${d.id}`)}
-                    className="group flex items-start gap-3.5 rounded-xl bg-card p-4 shadow-sm border border-border/60 transition-all duration-200 active:scale-[0.98] hover:shadow-md hover:-translate-y-0.5 animate-fade-up cursor-pointer select-none min-h-[44px]"
-                    style={{ animationDelay: `${i * 40}ms` }}
-                  >
-                    <span className="text-3xl leading-none mt-0.5">{d.flag_emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="font-semibold text-sm text-foreground truncate">
-                          {d.country_name}
-                        </h3>
-                        <VisaBadge type={visaTypeLabel[d.visa_type] || d.visa_type} />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                        {d.hero_tagline}
-                      </p>
+              : filtered.map((d, i) => {
+                  const tagline = (d.hero_tagline || "")
+                    .replace(/·?\s*₹[\d,]+\/day\s*budget/gi, "")
+                    .replace(/·\s*$/, "")
+                    .trim();
+                  return (
+                    <div
+                      key={d.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => navigate(`/destination/${d.id}`)}
+                      onKeyDown={(e) => e.key === "Enter" && navigate(`/destination/${d.id}`)}
+                      className="group flex flex-col items-center text-center gap-2 rounded-xl bg-card p-5 shadow-sm border border-border/60 transition-all duration-200 active:scale-[0.98] hover:shadow-md hover:-translate-y-0.5 animate-fade-up cursor-pointer select-none"
+                      style={{ animationDelay: `${i * 40}ms` }}
+                    >
+                      <span className="text-4xl leading-none">{d.flag_emoji}</span>
+                      <h3 className="font-semibold text-sm text-foreground truncate w-full">
+                        {d.country_name}
+                      </h3>
+                      <VisaBadge type={visaTypeLabel[d.visa_type] || d.visa_type} />
+                      {tagline && (
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {tagline}
+                        </p>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
             {!isLoading && filtered.length === 0 && (
               <p className="text-center text-sm text-muted-foreground py-8">
                 No destinations found. Try a different search.
